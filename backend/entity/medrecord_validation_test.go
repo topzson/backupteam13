@@ -73,7 +73,7 @@ func TestAmountNotLessThanZero(t *testing.T) {
 	g := NewGomegaWithT(t)
 
 	MedRecord := MedRecord{
-		Amount:     -2,
+		Amount:     -5,
 		AdviceText: "1 เม็ดหลังอาหาร",
 		Datetime:   time.Now().Add(-20 * time.Hour),
 	}
@@ -89,4 +89,23 @@ func TestAmountNotLessThanZero(t *testing.T) {
 
 	// err.Error ต้องมี error message แสดงออกมา
 	g.Expect(err.Error()).To(Equal("Amount does not validate as positive"))
+}
+
+func TestAmountIncorrect(t *testing.T) {
+	g := NewGomegaWithT(t)
+
+	fixtures := []int{
+		-1, -2, -3, -4, -5, -6, -7, -8, -9,
+	}
+	for _, fixture := range fixtures {
+		MedRecord := MedRecord{
+			Amount:     fixture,
+			AdviceText: "1 เม็ดหลังอาหาร",
+			Datetime:   time.Now().Add(-20 * time.Hour),
+		}
+		ok, err := govalidator.ValidateStruct(MedRecord)
+		g.Expect(ok).NotTo(BeTrue())
+		g.Expect(err).NotTo(BeNil())
+		g.Expect(err.Error()).To(Equal("Amount does not validate as positive"))
+	}
 }
