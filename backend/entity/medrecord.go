@@ -9,7 +9,7 @@ import (
 
 type MedRecord struct {
 	gorm.Model
-	Amount     uint      `valid:"notzero~Amount is not Zero Number"`
+	Amount     int       `valid:"positive~Amount does not validate as positive"`
 	AdviceText string    `valid:"required~Advicetext cannot be blank"`
 	Datetime   time.Time `valid:"past~Datetime must be in the past"`
 
@@ -24,12 +24,13 @@ type MedRecord struct {
 }
 
 func init() {
-	govalidator.CustomTypeTagMap.Set("notzero", func(i interface{}, context interface{}) bool {
-		v, _ := i.(uint)
-		return v > 0
-	})
+
 	govalidator.CustomTypeTagMap.Set("past", func(i interface{}, context interface{}) bool {
 		t := i.(time.Time)
 		return t.Before(time.Now())
+	})
+	govalidator.CustomTypeTagMap.Set("positive", func(i interface{}, context interface{}) bool {
+		num := i
+		return num.(int) > 0
 	})
 }
